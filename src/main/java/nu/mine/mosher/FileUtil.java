@@ -1,5 +1,6 @@
 package nu.mine.mosher;
 
+import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,10 @@ public final class FileUtil {
         verifyNoDirectoryTraversal(pathReal);
         verifyIsReadable(pathReal);
         return pathReal;
+    }
+
+    public static String readFrom(final Path source) throws IOException {
+        return String.join("\n", Files.readAllLines(source, StandardCharsets.UTF_8));
     }
 
 
