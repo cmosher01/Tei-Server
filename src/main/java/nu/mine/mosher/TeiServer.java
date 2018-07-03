@@ -31,8 +31,6 @@ public final class TeiServer {
     private static final Credentials.Store credentialsStore = GuestStoreImpl.instance();
     private static final String XML = ".xml";
     private static final String URL_TEISH_XSLT = "https://rawgit.com/cmosher01/teish/master/src/main/resources/teish.xslt";
-    private static final String URL_TEISH_CSS = "https://rawgit.com/cmosher01/teish/master/src/main/resources/teish.css";
-    private static final Map<String, Object> TEISH_OPTS = Map.of("full", true, "css", URL_TEISH_CSS);
 
     private TeiServer() {
         throw new UnsupportedOperationException();
@@ -76,12 +74,12 @@ public final class TeiServer {
         return unauthorized();
     }
 
-    private static Document buildPage(final Path path) throws IOException, SAXParseException, TransformerException {
-        return new Document(convertTeiToHtml(FileUtil.readFrom(path)), "text/html");
+    private static Document buildPage(final Path pathTei) throws IOException, SAXParseException, TransformerException {
+        return new Document(htmlPage(convertTeiToHtml(FileUtil.readFrom(pathTei))), MIME_HTML);
     }
 
     private static String convertTeiToHtml(final String tei) throws SAXParseException, IOException, TransformerException {
-        return new SimpleXml(tei).transform(teishXslt(), TEISH_OPTS);
+        return "<article><section>"+new SimpleXml(tei).transform(teishXslt())+"</section></article>";
     }
 
     private static String teishXslt() throws IOException {
@@ -92,7 +90,7 @@ public final class TeiServer {
 
     private static Document buildDirectoryPage(final Path path) throws IOException {
         final StringBuilder doc = new StringBuilder(256);
-        doc.append("<!doctype><html><head></head><body><ul>");
+        doc.append("<ul>");
         Files
             .list(path)
             .map(FileOrFolder::new)
@@ -105,20 +103,41 @@ public final class TeiServer {
                 .append("\">")
                 .append(f.name())
                 .append("</a></li>"));
-        doc.append("</ul></body></html>");
-        return new Document(doc.toString(), "text/html");
+        doc.append("</ul>");
+        return new Document(htmlPage(doc.toString()), MIME_HTML);
     }
 
     private static Response unauthorized() {
-        final Response authRequest = newFixedLengthResponse(UNAUTHORIZED, MIME_PLAINTEXT, UNAUTHORIZED.getDescription());
+        final Response authRequest = newFixedLengthResponse(UNAUTHORIZED, MIME_HTML,
+            htmlPage(
+                "<p>Access to this document is denied.</p>" +
+                "<a href=\"javascript:history.back()\">\u21E6 Back</a>"));
         authRequest.addHeader("WWW-Authenticate", "Basic realm=\"website\"");
         return authRequest;
     }
 
     private static Response redirectPermanent(final String to) {
         final Response redirect = newFixedLengthResponse(REDIRECT, MIME_HTML,
-            "<!doctype html><html><body>Redirected: <a href=\"" + to + "\">" + to + "</a></body></html>");
+            htmlPage("<p>Redirected to:<p><a href=\"" + to + "\">" + to + "</a>"));
         redirect.addHeader("Location", to);
         return redirect;
+    }
+
+    private static String htmlPage(final String htmlBody) {
+        final StringBuilder doc = new StringBuilder(256);
+        doc.append(
+            "<!doctype html>\n" +
+                "<html>\n" +
+                "   <head>\n" +
+                "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" +
+                "      <meta charset=\"utf-8\">\n" +
+                "      <link rel=\"stylesheet\" type=\"text/css\" href=\"https://mosher.mine.nu/genealogy/css/solarlt.css\">\n" + // TODO CSS
+                "      <title></title>\n" + // TODO title
+                "   </head>\n" +
+                "   <body>\n\n\n" +
+                htmlBody +
+                "\n\n\n   </body>\n" +
+                "</html>\n");
+        return doc.toString();
     }
 }

@@ -21,7 +21,7 @@ public final class FileUtil {
         final Path pathReal = path.toRealPath();
         if (LOG.isTraceEnabled()) {
             // use cleanse to guard against CWE 117: Improper Output Sanitization for Logs
-            LOG.trace("Path (relative|normal | real): {} | {} | {}", cleanse(relativePath), cleanse(path.toString()), cleanse(pathReal.toString()));
+            LOG.trace("Path (relative | normal | real): {} | {} | {}", cleanse(relativePath), cleanse(path.toString()), cleanse(pathReal.toString()));
         }
         verifyNoDirectoryTraversal(pathReal);
         verifyIsReadable(pathReal);
