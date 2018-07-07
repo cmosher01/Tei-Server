@@ -5,21 +5,24 @@ import fi.iki.elonen.NanoHTTPD.Response.Status;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.*;
-import java.util.*;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.TransformerException;
-import nu.mine.mosher.xml.SimpleXml;
+import nu.mine.mosher.xml.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import org.xml.sax.SAXParseException;
+import org.xml.sax.SAXException;
 
 import static fi.iki.elonen.NanoHTTPD.Response.Status.*;
 import static fi.iki.elonen.NanoHTTPD.*;
 import static java.lang.Runtime.getRuntime;
 
 public final class TeiServer {
+    private static final TagName PB = new TagName("http://www.tei-c.org/ns/1.0", "pb", "pb");
+
     static {
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
         System.setProperty("org.slf4j.simpleLogger.showDateTime", "true");
@@ -30,7 +33,9 @@ public final class TeiServer {
     private static final int PORT = 8080;
     private static final Credentials.Store credentialsStore = GuestStoreImpl.instance();
     private static final String XML = ".xml";
-    private static final String URL_TEISH_XSLT = "https://rawgit.com/cmosher01/teish/master/src/main/resources/teish.xslt";
+    private static final String URL_TEISH_XSLT_DEV = "https://rawgit.com/cmosher01/teish/master/src/main/resources/teish.xslt";
+    private static final String URL_TEISH_XSLT_1_8 = "https://cdn.rawgit.com/cmosher01/teish/1.8/src/main/resources/teish.xslt";
+    private static final String URL_TEISH_XSLT = URL_TEISH_XSLT_DEV;
 
     private TeiServer() {
         throw new UnsupportedOperationException();
@@ -58,7 +63,12 @@ public final class TeiServer {
         server.start(SOCKET_READ_TIMEOUT, false);
     }
 
-    private static Response getDocument(final IHTTPSession session, final FileAccess publicAccess) throws IOException, SAXParseException, TransformerException {
+    private static Response getDocument(final IHTTPSession session, final FileAccess publicAccess) throws
+        IOException,
+        SAXException,
+        TransformerException,
+        ParserConfigurationException,
+        XMLStreamException {
         final Path path = FileUtil.getRealPath(session.getUri());
         if (Files.isDirectory(path)) {
             if (!session.getUri().endsWith("/")) {
@@ -74,12 +84,12 @@ public final class TeiServer {
         return unauthorized();
     }
 
-    private static Document buildPage(final Path pathTei) throws IOException, SAXParseException, TransformerException {
+    private static Document buildPage(final Path pathTei) throws IOException, SAXException, TransformerException, ParserConfigurationException, XMLStreamException {
         return new Document(htmlPage(convertTeiToHtml(FileUtil.readFrom(pathTei))), MIME_HTML);
     }
 
-    private static String convertTeiToHtml(final String tei) throws SAXParseException, IOException, TransformerException {
-        return "<article><section>"+new SimpleXml(tei).transform(teishXslt())+"</section></article>";
+    private static String convertTeiToHtml(final String tei) throws SAXException, IOException, TransformerException, ParserConfigurationException, XMLStreamException {
+        return "<article><section>"+new SimpleXml(XmlUnMilestone.unMilestone(tei,PB)).transform(teishXslt())+"</section></article>";
     }
 
     private static String teishXslt() throws IOException {

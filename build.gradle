@@ -12,6 +12,7 @@ dependencies {
     implementation group: 'org.nanohttpd', name: 'nanohttpd', version: 'latest.integration'
     implementation group: 'nu.mine.mosher', name: 'strong-password-hash', version: 'latest.integration'
     implementation group: 'nu.mine.mosher.xml', name: 'SimpleXml', version: 'latest.integration'
+    implementation group: 'nu.mine.mosher.xml', name: 'xml-unmilestone', version: 'latest.integration'
     implementation group: 'org.slf4j', name: 'slf4j-api', version: 'latest.release'
 
     runtimeOnly group: 'org.slf4j', name: 'slf4j-simple', version: 'latest.release'
