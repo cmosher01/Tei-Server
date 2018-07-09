@@ -142,6 +142,35 @@ public final class TeiServer {
                 "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" +
                 "      <meta charset=\"utf-8\">\n" +
                 "      <link rel=\"stylesheet\" type=\"text/css\" href=\"https://mosher.mine.nu/genealogy/css/solarlt.css\">\n" + // TODO CSS
+                "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/openseadragon/2.3.1/openseadragon.min.js\"></script>\n" +
+                "<script type=\"text/javascript\">\n" +
+                "    function seadragon(e) {\n" +
+                "        var viewer = OpenSeadragon({\n" +
+                "            prefixUrl: \"https://cdnjs.cloudflare.com/ajax/libs/openseadragon/2.3.1/images/\",\n" +
+                "            element: e,\n" +
+                "            tileSources: e.getAttribute(\"tilesources\"),\n" +
+                "            maxZoomPixelRatio: 10\n" +
+                "        });\n" +
+                "        viewer.addHandler(\"open\", function(){\n" +
+                "            var oldBounds = viewer.viewport.getBounds();\n" +
+                "            var newBounds = new OpenSeadragon.Rect(0, 0.2, 1, oldBounds.height / oldBounds.width);\n" +
+                "            viewer.viewport.fitBounds(newBounds, true);\n" +
+                "        });\n" +
+                "    }\n" +
+                "    window.onload = () => {\n" +
+                "        var i;\n" +
+                "        const sds = document.querySelectorAll(\"img.tei-graphic\");\n" +
+                "        for (i = 0; i < sds.length; ++i) {\n" +
+                "            const img = sds[i];\n" +
+                "            const url = img.getAttribute(\"url\").replace(/\\.ptif\\/.*/, \".ptif/info.json\")\n" +
+                "            const div = document.createElement(\"div\");\n" +
+                "            div.setAttribute(\"class\", \"tei-graphic\");\n" +
+                "            div.setAttribute(\"tilesources\", url);\n" +
+                "            img.parentNode.replaceChild(div, img);\n" +
+                "            seadragon(div);\n" +
+                "        }\n" +
+                "    }\n" +
+                "</script>\n" +
                 "      <title></title>\n" + // TODO title
                 "   </head>\n" +
                 "   <body>\n\n\n" +
