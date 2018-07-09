@@ -151,11 +151,16 @@ public final class TeiServer {
                 "            tileSources: e.getAttribute(\"tilesources\"),\n" +
                 "            maxZoomPixelRatio: 10\n" +
                 "        });\n" +
-                "        viewer.addHandler(\"open\", function(){\n" +
-                "            var oldBounds = viewer.viewport.getBounds();\n" +
-                "            var newBounds = new OpenSeadragon.Rect(0, 0.2, 1, oldBounds.height / oldBounds.width);\n" +
-                "            viewer.viewport.fitBounds(newBounds, true);\n" +
-                "        });\n" +
+                //"        viewer.addHandler(\"open\", function(){\n" +
+                //"            var oldBounds = viewer.viewport.getBounds();\n" +
+                //"            const imgsize = viewer.world.getItemAt(0).getContentSize();\n" +
+                //"            const h = imgsize.y / imgsize.x;\n" +
+                //"            var newBounds = new OpenSeadragon.Rect(0, 0, 1, h);\n" +
+                //"            viewer.viewport.fitBounds(newBounds, true);\n" +
+                //"            const vpbounds = viewer.viewport.getBounds(true);\n console.log(vpbounds);\n" +
+                //"            viewer.viewport.panBy({x: 0, y: -vpbounds.y}, true);\n" +
+                //"            console.log(viewer.viewport.getBounds(true)+'\\n\\n');\n" +
+                //"        });\n" +
                 "    }\n" +
                 "    window.onload = () => {\n" +
                 "        var i;\n" +
