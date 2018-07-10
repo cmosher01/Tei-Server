@@ -69,10 +69,19 @@ public final class TeiServer {
         TransformerException,
         ParserConfigurationException,
         XMLStreamException {
-        final Path path = FileUtil.getRealPath(session.getUri());
+        final String sUri = session.getUri();
+
+        if (sUri.endsWith(".js")) {
+            String res = "/"+sUri;
+            res = res.substring(res.lastIndexOf('/')+1);
+            final InputStream inRes = TeiServer.class.getResourceAsStream("/"+res);
+            return newChunkedResponse(Status.OK, mimeTypes().get("js"), inRes);
+        }
+
+        final Path path = FileUtil.getRealPath(sUri);
         if (Files.isDirectory(path)) {
-            if (!session.getUri().endsWith("/")) {
-                return redirectPermanent(session.getUri()+"/");
+            if (!sUri.endsWith("/")) {
+                return redirectPermanent(sUri +"/");
             }
         }
 
@@ -137,51 +146,19 @@ public final class TeiServer {
         final StringBuilder doc = new StringBuilder(256);
         doc.append(
             "<!doctype html>\n" +
-                "<html>\n" +
-                "   <head>\n" +
-                "      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" +
-                "      <meta charset=\"utf-8\">\n" +
-                "      <link rel=\"stylesheet\" type=\"text/css\" href=\"https://mosher.mine.nu/genealogy/css/solarlt.css\">\n" + // TODO CSS
-                "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/openseadragon/2.3.1/openseadragon.min.js\"></script>\n" +
-                "<script type=\"text/javascript\">\n" +
-                "    function seadragon(e) {\n" +
-                "        var viewer = OpenSeadragon({\n" +
-                "            prefixUrl: \"https://cdnjs.cloudflare.com/ajax/libs/openseadragon/2.3.1/images/\",\n" +
-                "            element: e,\n" +
-                "            tileSources: e.getAttribute(\"tilesources\"),\n" +
-                "            maxZoomPixelRatio: 10\n" +
-                "        });\n" +
-                //"        viewer.addHandler(\"open\", function(){\n" +
-                //"            var oldBounds = viewer.viewport.getBounds();\n" +
-                //"            const imgsize = viewer.world.getItemAt(0).getContentSize();\n" +
-                //"            const h = imgsize.y / imgsize.x;\n" +
-                //"            var newBounds = new OpenSeadragon.Rect(0, 0, 1, h);\n" +
-                //"            viewer.viewport.fitBounds(newBounds, true);\n" +
-                //"            const vpbounds = viewer.viewport.getBounds(true);\n console.log(vpbounds);\n" +
-                //"            viewer.viewport.panBy({x: 0, y: -vpbounds.y}, true);\n" +
-                //"            console.log(viewer.viewport.getBounds(true)+'\\n\\n');\n" +
-                //"        });\n" +
-                "    }\n" +
-                "    window.onload = () => {\n" +
-                "        var i;\n" +
-                "        const sds = document.querySelectorAll(\"img.tei-graphic\");\n" +
-                "        for (i = 0; i < sds.length; ++i) {\n" +
-                "            const img = sds[i];\n" +
-                "            const url = img.getAttribute(\"url\").replace(/\\.ptif\\/.*/, \".ptif/info.json\")\n" +
-                "            const div = document.createElement(\"div\");\n" +
-                "            div.setAttribute(\"class\", \"tei-graphic\");\n" +
-                "            div.setAttribute(\"tilesources\", url);\n" +
-                "            img.parentNode.replaceChild(div, img);\n" +
-                "            seadragon(div);\n" +
-                "        }\n" +
-                "    }\n" +
-                "</script>\n" +
-                "      <title></title>\n" + // TODO title
-                "   </head>\n" +
-                "   <body>\n\n\n" +
-                htmlBody +
-                "\n\n\n   </body>\n" +
-                "</html>\n");
+            "<html>\n" +
+            "<head>\n" +
+            "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" +
+            "<meta charset=\"utf-8\">\n" +
+            "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://mosher.mine.nu/genealogy/css/solarlt.css\">\n" + // TODO CSS
+            "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/openseadragon/2.3.1/openseadragon.min.js\"></script>\n" +
+            "<script src=\"tei.js\"></script>\n" +
+            "<title></title>\n" + // TODO title
+            "</head>\n" +
+            "<body>\n\n\n" +
+            htmlBody +
+            "\n\n\n</body>\n" +
+            "</html>\n");
         return doc.toString();
     }
 }
