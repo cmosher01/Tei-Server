@@ -151,8 +151,8 @@ public final class TeiServer {
             "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" +
             "<meta charset=\"utf-8\">\n" +
             "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://mosher.mine.nu/genealogy/css/solarlt.css\">\n" + // TODO CSS
-            "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/openseadragon/2.3.1/openseadragon.min.js\"></script>\n" +
-            "<script src=\"tei.js\"></script>\n" +
+            //"<script src=\"https://cdnjs.cloudflare.com/ajax/libs/openseadragon/2.3.1/openseadragon.min.js\"></script>\n" +
+            //"<script src=\"tei.js\"></script>\n" +
             "<title></title>\n" + // TODO title
             "</head>\n" +
             "<body>\n\n\n" +
