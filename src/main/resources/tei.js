@@ -3,7 +3,7 @@ function onClickImage(evt) {
     const src = img.getAttribute("src");
 
     const closex = document.createElement("a");
-    closex.setAttribute("href", "#");
+    closex.setAttribute("href", "javascript:void(0);");
     closex.innerText = "{close}";
     closex.style.float = "right";
 
@@ -31,23 +31,28 @@ function onClickImage(evt) {
     });
     closex.addEventListener("click", function(evt) {
         evt.target.parentNode.close();
+        return false;
     });
+    dialog.style.position = "fixed";
     dialog.style.width = "80vw";
     dialog.style.height = "80vh";
     dialog.style.top = "50%";
     dialog.style.left = "50%";
     dialog.style.transform = "translate(-50%, -50%)";
+    dialog.style.color = "var(--sol-base03)";
+    dialog.style.backgroundColor = "var(--sol-base3)";
 
     dialog.appendChild(closex);
     const title = document.createElement("div");
     title.innerText = src;
-    title.style["overflow-wrap"] = "break-word";
+    title.style.overflowWrap = "break-word";
     dialog.appendChild(title);
 
     dialog.appendChild(osd);
 
-    const body = document.getElementsByTagName('body')[0];
-    body.appendChild(dialog);
+    const scrpos = document.scrollingElement.scrollTop;
+    console.log("scroll at: "+scrpos);
+    document.body.appendChild(dialog);
 
     var viewer = OpenSeadragon({
         prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/2.3.1/images/",
@@ -56,8 +61,14 @@ function onClickImage(evt) {
         tileSources: url,
         maxZoomPixelRatio: 10
     });
+    const osdinner = document.querySelectorAll(".openseadragon-container")[0];
+    osdinner.style.backgroundColor = "var(--sol-base3)";
 
     dialog.showModal();
+
+    document.scrollingElement.scrollTop = scrpos;
+
+    return false;
 }
 
 window.onload = function() {
