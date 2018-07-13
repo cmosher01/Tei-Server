@@ -1,74 +1,67 @@
-function onClickImage(evt) {
-    const img = evt.target;
-    const src = img.getAttribute("src");
+function onClickImage(event) {
+    const src = event.target.getAttribute("src");
+    /*
+    Assume src is a IIIF Image API 2.0 format URI:
+        {scheme}://{server}{/prefix}/{identifier}/{region}/{size}/{rotation}/{quality}.{format}
+    For example:
+        https://www.example.com/images/path/to/some_image.ptif/150,320,4800,3000/full/90/default.jpg
+    match to get:
+    [1]: "https://www.example.com/images/path/to/some_image.ptif"
+    [2]: "150,320,4800,3000" {region}
+    [3]: "full" {size}
+    [4]: "90" {rotation} (and mirror)
+    [5]: "default.jpg"
+    */
 
-    const closex = document.createElement("a");
-    closex.setAttribute("href", "javascript:void(0);");
-    closex.innerText = "{close}";
-    closex.style.float = "right";
+    /* match last 4 fields non-greedy, and beginning field greedy: */
+    const srcMatch = src.match(/^(.+)\/([^/]+?)\/([^/]+?)\/([^/]+?)\/([^/]+?)$/);
 
-    const urlmat = src.match(/^(.*\.ptif)\/(.*)$/);
-    const url = urlmat[1]+"/info.json";
-    const pmat = urlmat[2].split("/"); /* 150,320,4800,3000/full/!270/default.jpg */
-    // TODO: make home be specified region (pmat[0]), if OSD allows it (see below)
-    const mirrot = pmat[2];
-    if (mirrot.startsWith("!")) {
-        rot = parseInt(mirrot.substring(1), 10);
-    } else {
-        rot = parseInt(mirrot, 10);
-    }
+    const tiles = srcMatch[1]+"/info.json";
+    const rot = parseInt(srcMatch[4].startsWith("!") ? srcMatch[4].substring(1) : srcMatch[4], 10);
 
-    const osd = document.createElement("div");
-    osd.style.width = "80%";
-    osd.style.height = "80%";
-    osd.style.top = "50%";
-    osd.style.left = "50%";
-    osd.style.transform = "translate(-50%, -50%)";
-
-    const dialog = document.createElement("dialog");
-    dialog.addEventListener("close", function(evt) {
-        evt.target.parentNode.removeChild(evt.target);
-    });
-    closex.addEventListener("click", function(evt) {
-        evt.target.parentNode.close();
-        return false;
-    });
-    dialog.style.position = "fixed";
-    dialog.style.width = "80vw";
-    dialog.style.height = "80vh";
-    dialog.style.top = "50%";
-    dialog.style.left = "50%";
-    dialog.style.transform = "translate(-50%, -50%)";
-    dialog.style.color = "var(--sol-base03)";
-    dialog.style.backgroundColor = "var(--sol-base3)";
-
-    dialog.appendChild(closex);
-    const title = document.createElement("div");
-    title.innerText = src;
-    title.style.overflowWrap = "break-word";
-    dialog.appendChild(title);
-
-    dialog.appendChild(osd);
-
+    const div = document.createElement("div");
     const scrpos = document.scrollingElement.scrollTop;
-    console.log("scroll at: "+scrpos);
-    document.body.appendChild(dialog);
+    document.body.appendChild(div);
 
-    var viewer = OpenSeadragon({
+    const viewer = OpenSeadragon({
         prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/2.3.1/images/",
-        element: osd,
+        element: div,
         degrees: rot,
-        tileSources: url,
+        tileSources: tiles,
         maxZoomPixelRatio: 10
     });
-    const osdinner = document.querySelectorAll(".openseadragon-container")[0];
-    osdinner.style.backgroundColor = "var(--sol-base3)";
+    viewer.setFullScreen(true);
 
-    dialog.showModal();
+    viewer.addHandler("close", function(evt) {
+        const d = evt.userData.div;
+        d.parentNode.removeChild(d);
+    }, {div: div});
+
+    viewer.addHandler("open", function(x) {
+        const strOrd = x.userData.strOrds;
+        if (strOrd !== "full") {
+            const strOrds = strOrd.split(",");
+            const rectFit = new OpenSeadragon.Rect(
+                parseInt(strOrds[0]),
+                parseInt(strOrds[1]),
+                parseInt(strOrds[2]),
+                parseInt(strOrds[3]));
+            const rectView = x.eventSource.viewport.imageToViewportRectangle(rectFit);
+            // doesn't seem to fill the whole viewport, but at least it centers it:
+            x.eventSource.viewport.fitBounds(rectView, true);
+        }
+    }, {strOrds: srcMatch[2]});
+
+    viewer.addHandler("full-screen", function(x) {
+        if (!x.fullScreen) {
+            x.eventSource.close();
+        }
+    });
 
     document.scrollingElement.scrollTop = scrpos;
 
-    return false;
+    const osd = document.querySelectorAll(".openseadragon-container")[0];
+    osd.style.backgroundColor = "var(--sol-base3)";
 }
 
 window.onload = function() {
@@ -79,32 +72,3 @@ window.onload = function() {
         img.addEventListener("click", onClickImage);
     }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// TODO: make home be specified region (pmat[0]), if OSD allows it
-// viewer.addHandler("open", function(x) {
-//     const strRectImg = pmat[0];
-//     if (strRectImg !== "full") {
-//         const xf = x.eventSource.viewport._contentSizeNoRotate.x;
-//         const yf = x.eventSource.viewport._contentSizeNoRotate.y;
-//         const strOrds = strRectImg.split(",");
-//         const rectFit = new OpenSeadragon.Rect(
-//             parseInt(strOrds[0])/xf,
-//             parseInt(strOrds[1])/yf,
-//             parseInt(strOrds[2])/xf,
-//             parseInt(strOrds[3])/yf);
-//         x.eventSource.viewport.setHomeBounds(rectFit, xf);
-//     }
-// });
