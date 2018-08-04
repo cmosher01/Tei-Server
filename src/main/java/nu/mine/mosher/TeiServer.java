@@ -14,6 +14,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.List;
+
 import org.xml.sax.SAXException;
 
 import static fi.iki.elonen.NanoHTTPD.Response.Status.*;
@@ -72,10 +75,10 @@ public final class TeiServer {
         final String sUri = session.getUri();
 
         if (sUri.endsWith(".js")) {
-            String res = "/"+sUri;
-            res = res.substring(res.lastIndexOf('/')+1);
-            final InputStream inRes = TeiServer.class.getResourceAsStream("/"+res);
-            return newChunkedResponse(Status.OK, mimeTypes().get("js"), inRes);
+            return getResource(sUri, "js");
+        }
+        if (sUri.endsWith(".css")) {
+            return getResource(sUri, "css");
         }
 
         final Path path = FileUtil.getRealPath(sUri);
@@ -85,16 +88,31 @@ public final class TeiServer {
             }
         }
 
+        final boolean asTei = Boolean.valueOf(session.getParameters().getOrDefault("tei", List.of(Boolean.FALSE.toString())).get(0));
+
         if (publicAccess.allowed(path) || Credentials.fromSession(session, credentialsStore).valid()) {
-            final Document document = Files.isDirectory(path) ? buildDirectoryPage(path) : buildPage(path);
+            final Document document = Files.isDirectory(path) ? buildDirectoryPage(path) : buildPage(path, asTei);
             return newFixedLengthResponse(Status.OK, document.mime(), document.document());
         }
 
         return unauthorized();
     }
 
-    private static Document buildPage(final Path pathTei) throws IOException, SAXException, TransformerException, ParserConfigurationException, XMLStreamException {
-        return new Document(htmlPage(convertTeiToHtml(FileUtil.readFrom(pathTei))), MIME_HTML);
+    private static Response getResource(String sUri, String mimekey) {
+        String res = "/"+sUri;
+        res = res.substring(res.lastIndexOf('/')+1);
+        final InputStream inRes = TeiServer.class.getResourceAsStream("/"+res);
+        return newChunkedResponse(Status.OK, mimeTypes().get(mimekey), inRes);
+    }
+
+    private static Document buildPage(final Path pathTei, boolean asTei) throws IOException, SAXException, TransformerException, ParserConfigurationException, XMLStreamException {
+        final Document doc;
+        if (asTei) {
+            doc = new Document(FileUtil.readFrom(pathTei), "application/xml; charset=utf-8");
+        } else {
+            doc = new Document(htmlPage(convertTeiToHtml(FileUtil.readFrom(pathTei))), MIME_HTML);
+        }
+        return doc;
     }
 
     private static String convertTeiToHtml(final String tei) throws SAXException, IOException, TransformerException, ParserConfigurationException, XMLStreamException {
@@ -109,6 +127,8 @@ public final class TeiServer {
 
     private static Document buildDirectoryPage(final Path path) throws IOException {
         final StringBuilder doc = new StringBuilder(256);
+        doc.append("<article>");
+        doc.append("<section>");
         doc.append("<ul>");
         Files
             .list(path)
@@ -123,6 +143,8 @@ public final class TeiServer {
                 .append(f.name())
                 .append("</a></li>"));
         doc.append("</ul>");
+        doc.append("</section>");
+        doc.append("</article>");
         return new Document(htmlPage(doc.toString()), MIME_HTML);
     }
 
@@ -146,11 +168,11 @@ public final class TeiServer {
         final StringBuilder doc = new StringBuilder(256);
         doc.append(
             "<!doctype html>\n" +
-            "<html>\n" +
+            "<html class=\"solarizedLight\">\n" +
             "<head>\n" +
             "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" +
             "<meta charset=\"utf-8\">\n" +
-            "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://mosher.mine.nu/genealogy/css/solarlt.css\">\n" + // TODO CSS
+            "<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n" +
             "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/openseadragon/2.3.1/openseadragon.min.js\"></script>\n" +
             "<script src=\"tei.js\"></script>\n" +
             "<title></title>\n" + // TODO title

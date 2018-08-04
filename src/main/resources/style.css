@@ -1,0 +1,13 @@
+@import url("https://rawgit.com/cmosher01/PlainWebCss/master/src/main/resources/css/reset.css");
+@import url("https://rawgit.com/cmosher01/PlainWebCss/master/src/main/resources/css/fonts.css");
+@import url("https://rawgit.com/cmosher01/PlainWebCss/master/src/main/resources/css/solarized.css");
+@import url("https://rawgit.com/cmosher01/teish/master/src/main/resources/teish.css");
+
+section {
+    margin: 2ex 2rem 2ex 2rem;
+}
+
+a:hover {
+    background-color: var(--sol-base2);
+    color: var(--sol-orange);
+}
