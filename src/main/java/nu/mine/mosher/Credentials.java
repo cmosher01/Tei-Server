@@ -1,6 +1,9 @@
 package nu.mine.mosher;
 
 import fi.iki.elonen.NanoHTTPD;
+import nu.mine.mosher.security.password.HashedString;
+import nu.mine.mosher.security.password.StrongHash;
+
 import java.util.Base64;
 
 public class Credentials {
@@ -51,7 +54,11 @@ public class Credentials {
             return false;
         }
 
-        if (!StrongHash.isPasswordValid(credentials[1], passwordHash)) {
+        try {
+            if (!StrongHash.isPasswordValid(credentials[1], passwordHash)) {
+                return false;
+            }
+        } catch (HashedString.InvalidFormat shouldNeverHappen) {
             return false;
         }
 
