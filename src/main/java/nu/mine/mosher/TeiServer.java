@@ -168,7 +168,7 @@ public final class TeiServer {
         final StringBuilder doc = new StringBuilder(256);
         doc.append(
             "<!doctype html>\n" +
-            "<html class=\"solarizedLight\">\n" +
+            "<html class=\"fontFeatures unicodeWebFonts solarizedLight\">\n" +
             "<head>\n" +
             "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" +
             "<meta charset=\"utf-8\">\n" +
