@@ -11,23 +11,3 @@ a:hover {
     background-color: var(--sol-base2);
     color: var(--sol-orange);
 }
-
-/*
-Override subscript and superscript to use
-the features from EB Garamond font.
-*/
-[rend~=sup], [type=turnover] {
-    font-feature-settings: "sups", "kern", "liga", "clig", "dlig";
-    /* turn off teish settings: */
-    position: static;
-    font-size: 100%;
-    top: 0;
-}
-
-[rend~=sub], [type=turnunder] {
-    font-feature-settings: "subs", "kern", "liga", "clig", "dlig";
-    /* turn off teish settings: */
-    position: static;
-    font-size: 100%;
-    top: 0;
-}
