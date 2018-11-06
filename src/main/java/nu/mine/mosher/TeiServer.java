@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.List;
 
 import org.xml.sax.SAXException;
@@ -88,10 +87,10 @@ public final class TeiServer {
             }
         }
 
-        final boolean asTei = Boolean.valueOf(session.getParameters().getOrDefault("tei", List.of(Boolean.FALSE.toString())).get(0));
-
         if (publicAccess.allowed(path) || Credentials.fromSession(session, credentialsStore).valid()) {
-            final Document document = Files.isDirectory(path) ? buildDirectoryPage(path) : buildPage(path, asTei);
+            final boolean asTei = Boolean.valueOf(session.getParameters().getOrDefault("tei", List.of(Boolean.FALSE.toString())).get(0));
+            final boolean withOsd = Boolean.valueOf(session.getParameters().getOrDefault("osd", List.of(Boolean.FALSE.toString())).get(0));
+            final Document document = Files.isDirectory(path) ? buildDirectoryPage(path) : buildPage(path, asTei, withOsd);
             return newFixedLengthResponse(Status.OK, document.mime(), document.document());
         }
 
@@ -105,17 +104,19 @@ public final class TeiServer {
         return newChunkedResponse(Status.OK, mimeTypes().get(mimekey), inRes);
     }
 
-    private static Document buildPage(final Path pathTei, boolean asTei) throws IOException, SAXException, TransformerException, ParserConfigurationException, XMLStreamException {
+    private static Document buildPage(final Path pathTei, final boolean asTei, final boolean osd)
+        throws IOException, SAXException, TransformerException, ParserConfigurationException, XMLStreamException {
         final Document doc;
         if (asTei) {
             doc = new Document(FileUtil.readFrom(pathTei), "application/xml; charset=utf-8");
         } else {
-            doc = new Document(htmlPage(convertTeiToHtml(FileUtil.readFrom(pathTei))), MIME_HTML);
+            doc = new Document(htmlPage(convertTeiToHtml(FileUtil.readFrom(pathTei)), osd), MIME_HTML);
         }
         return doc;
     }
 
-    private static String convertTeiToHtml(final String tei) throws SAXException, IOException, TransformerException, ParserConfigurationException, XMLStreamException {
+    private static String convertTeiToHtml(final String tei)
+        throws SAXException, IOException, TransformerException, ParserConfigurationException, XMLStreamException {
         return "<article><section>"+new SimpleXml(XmlUnMilestone.unMilestone(tei,PB)).transform(teishXslt())+"</section></article>";
     }
 
@@ -165,6 +166,10 @@ public final class TeiServer {
     }
 
     private static String htmlPage(final String htmlBody) {
+        return htmlPage(htmlBody, false);
+    }
+
+    private static String htmlPage(final String htmlBody, final boolean osd) {
         final StringBuilder doc = new StringBuilder(256);
         doc.append(
             "<!doctype html>\n" +
@@ -173,8 +178,12 @@ public final class TeiServer {
             "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" +
             "<meta charset=\"utf-8\">\n" +
             "<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n" +
-            "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/openseadragon/2.3.1/openseadragon.min.js\"></script>\n" +
-            "<script src=\"tei.js\"></script>\n" +
+            (osd ?
+                "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/openseadragon/2.3.1/openseadragon.min.js\"></script>\n" +
+                "<script src=\"tei.js\"></script>\n"
+            :
+                ""
+            ) +
             "<title></title>\n" + // TODO title
             "</head>\n" +
             "<body>\n\n\n" +
