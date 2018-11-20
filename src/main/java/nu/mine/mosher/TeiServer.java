@@ -83,7 +83,11 @@ public final class TeiServer {
         final Path path = FileUtil.getRealPath(sUri);
         if (Files.isDirectory(path)) {
             if (!sUri.endsWith("/")) {
-                return redirectPermanent(sUri +"/");
+                String host = session.getHeaders().get("Host");
+                if (host == null || host.isEmpty()) {
+                    host = "tei";
+                }
+                return redirectPermanent("http://"+host+":"+PORT+sUri +"/");
             }
         }
 
