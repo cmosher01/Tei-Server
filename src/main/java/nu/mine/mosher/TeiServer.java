@@ -35,7 +35,7 @@ public final class TeiServer {
     private static final int PORT = 8080;
     private static final Credentials.Store credentialsStore = GuestStoreImpl.instance();
     private static final String XML = ".xml";
-    private static final String URL_TEISH_XSLT = "https://cdn.jsdelivr.net/gh/cmosher01/teish@/master/src/main/resources/teish.xslt";
+    private static final String URL_TEISH_XSLT = "https://cdn.jsdelivr.net/gh/cmosher01/teish@master/src/main/resources/teish.xslt";
 
     private TeiServer() {
         throw new UnsupportedOperationException();
