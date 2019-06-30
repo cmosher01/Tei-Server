@@ -1,8 +1,6 @@
 repositories {
     mavenCentral()
-    maven {
-        url 'https://mosher.mine.nu/nexus/repository/maven-public/'
-    }
+    jcenter()
 }
 
 apply plugin: 'java'
@@ -10,7 +8,7 @@ apply plugin: 'application'
 
 dependencies {
     implementation group: 'org.nanohttpd', name: 'nanohttpd', version: 'latest.integration'
-    implementation group: 'nu.mine.mosher', name: 'strong-password-hash', version: 'latest.integration'
+    implementation group: 'nu.mine.mosher.security.password', name: 'strong-password-hash', version: 'latest.integration'
     implementation group: 'nu.mine.mosher.xml', name: 'SimpleXml', version: 'latest.integration'
     implementation group: 'nu.mine.mosher.xml', name: 'xml-unmilestone', version: 'latest.integration'
     implementation group: 'org.slf4j', name: 'slf4j-api', version: 'latest.release'
@@ -21,4 +19,3 @@ dependencies {
 group = 'nu.mine.mosher'
 version = '1.0.0-SNAPSHOT'
 mainClassName = 'nu.mine.mosher.TeiServer'
-sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_9

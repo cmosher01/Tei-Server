@@ -33,35 +33,42 @@ public class Credentials {
 
 
     private static boolean checkValid(final String authorization, final Store store) {
+        boolean failed = false;
+
         if (authorization.isEmpty()) {
-            return false;
+            failed = true;
         }
 
         if (!authorization.startsWith(BASIC)) {
-            return false;
+            failed = true;
         }
 
-        final String base64Credentials = authorization.substring(BASIC.length()); // username:password
+        final String base64Credentials = failed ? "" : authorization.substring(BASIC.length()); // username:password
 
         final String[] credentials = new String(Base64.getDecoder().decode(base64Credentials)).split(":", -1);
 
+        String username = "";
+        String password = "";
         if (credentials.length < 2) {
-            return false;
+            failed = true;
+        } else {
+            username = credentials[0];
+            password = credentials[1];
         }
 
-        final String passwordHash = store.passwordFor(credentials[0]);
+        final String passwordHash = store.passwordFor(username);
         if (passwordHash.isEmpty()) {
-            return false;
+            failed = true;
         }
 
         try {
-            if (!StrongHash.isPasswordValid(credentials[1], passwordHash)) {
-                return false;
+            if (!StrongHash.isPasswordValid(password, passwordHash)) {
+                failed = true;
             }
         } catch (HashedString.InvalidFormat shouldNeverHappen) {
-            return false;
+            failed = true;
         }
 
-        return true;
+        return !failed;
     }
 }
