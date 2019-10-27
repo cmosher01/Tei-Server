@@ -8,7 +8,7 @@ import org.xml.sax.SAXException;
 
 import javax.xml.transform.TransformerException;
 import java.io.*;
-import java.net.URI;
+import java.net.*;
 import java.nio.file.*;
 import java.util.*;
 
@@ -27,7 +27,14 @@ public final class TeiServer {
     private static final int PORT = 8080;
     private static final Credentials.Store credentialsStore = GuestStoreImpl.instance();
     private static final String XML = ".xml";
-    private static final URI URI_TEISH_XSLT = URI.create("https://cdn.jsdelivr.net/gh/cmosher01/teish@master/src/main/resources/teish.xslt");
+    private static final URL URL_TEISH_XSLT;
+    static {
+        try {
+            URL_TEISH_XSLT = URI.create("https://cdn.jsdelivr.net/gh/cmosher01/teish@master/src/main/resources/teish.xslt").toURL();
+        } catch (final Throwable e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
     private TeiServer() {
         throw new UnsupportedOperationException();
@@ -109,7 +116,7 @@ public final class TeiServer {
     }
 
     private static String teishXslt() throws IOException {
-        return FileUtil.readFrom(Paths.get(URI_TEISH_XSLT));
+        return FileUtil.readFrom(URL_TEISH_XSLT);
     }
 
     private static Document buildDirectoryPage(final Path path) throws IOException {

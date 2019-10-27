@@ -1,13 +1,12 @@
 package nu.mine.mosher;
 
-import java.nio.charset.StandardCharsets;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.*;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
+import java.util.stream.Collectors;
 
 import static nu.mine.mosher.LogUtil.cleanse;
 
@@ -30,6 +29,12 @@ public final class FileUtil {
 
     public static String readFrom(final Path source) throws IOException {
         return String.join("\n", Files.readAllLines(source, StandardCharsets.UTF_8));
+    }
+
+    public static String readFrom(final URL source) throws IOException {
+        try (final BufferedReader reader = new BufferedReader(new InputStreamReader(source.openConnection().getInputStream(), StandardCharsets.UTF_8))) {
+            return reader.lines().collect(Collectors.joining("\n", "", "\n"));
+        }
     }
 
 
