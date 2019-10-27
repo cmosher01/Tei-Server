@@ -1,30 +1,40 @@
-FROM gradle:jdk12
+FROM amazoncorretto:8 AS build
 
 MAINTAINER Christopher A. Mosher <cmosher01@gmail.com>
 
-EXPOSE 8080
-VOLUME /home/gradle/srv
-
-
+USER root
+ENV HOME /root
+WORKDIR $HOME
 
 RUN echo "org.gradle.daemon=false" >gradle.properties
 
-USER root
-
-RUN chown -R gradle: /usr/local
+COPY gradle/ gradle/
+COPY gradlew ./
+RUN ./gradlew --version
 
 COPY settings.gradle ./
 COPY build.gradle ./
 COPY src/ ./src/
 
-RUN chown -R gradle: ./
+RUN ./gradlew build
 
-USER gradle
 
-RUN gradle build
 
-RUN tar xf /home/gradle/build/distributions/*.tar --strip-components=1 -C /usr/local
+FROM amazoncorretto:8
 
-WORKDIR /home/gradle/srv
+USER root
+ENV HOME /root
+WORKDIR $HOME
 
-ENTRYPOINT ["/usr/local/bin/tei-server"]
+RUN yum -y install tar shadow-utils
+
+COPY --from=build /root/build/distributions/*.tar ./
+RUN tar xvf *.tar --strip-components=1 -C /usr/local
+
+RUN useradd user
+USER user
+ENV HOME /home/user
+WORKDIR $HOME
+
+EXPOSE 8080
+CMD ["tei-server"]

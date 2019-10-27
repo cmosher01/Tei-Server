@@ -2,29 +2,21 @@ package nu.mine.mosher;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.Response.Status;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.*;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.TransformerException;
-import nu.mine.mosher.xml.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
+import nu.mine.mosher.xml.SimpleXml;
+import org.slf4j.*;
 import org.xml.sax.SAXException;
 
-import static fi.iki.elonen.NanoHTTPD.Response.Status.*;
+import javax.xml.transform.TransformerException;
+import java.io.*;
+import java.net.URI;
+import java.nio.file.*;
+import java.util.*;
+
 import static fi.iki.elonen.NanoHTTPD.*;
+import static fi.iki.elonen.NanoHTTPD.Response.Status.*;
 import static java.lang.Runtime.getRuntime;
 
 public final class TeiServer {
-    private static final TagName PB = new TagName("http://www.tei-c.org/ns/1.0", "pb", "pb");
-
     static {
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
         System.setProperty("org.slf4j.simpleLogger.showDateTime", "true");
@@ -35,7 +27,7 @@ public final class TeiServer {
     private static final int PORT = 8080;
     private static final Credentials.Store credentialsStore = GuestStoreImpl.instance();
     private static final String XML = ".xml";
-    private static final String URL_TEISH_XSLT = "https://cdn.jsdelivr.net/gh/cmosher01/teish@master/src/main/resources/teish.xslt";
+    private static final URI URI_TEISH_XSLT = URI.create("https://cdn.jsdelivr.net/gh/cmosher01/teish@master/src/main/resources/teish.xslt");
 
     private TeiServer() {
         throw new UnsupportedOperationException();
@@ -63,12 +55,9 @@ public final class TeiServer {
         server.start(SOCKET_READ_TIMEOUT, false);
     }
 
-    private static Response getDocument(final IHTTPSession session, final FileAccess publicAccess) throws
-        IOException,
-        SAXException,
-        TransformerException,
-        ParserConfigurationException,
-        XMLStreamException {
+    private static final List<String> LIST_OF_FALSE = Collections.singletonList(Boolean.FALSE.toString());
+
+    private static Response getDocument(final IHTTPSession session, final FileAccess publicAccess) throws IOException, SAXException, TransformerException {
         final String sUri = session.getUri();
 
         if (sUri.endsWith(".css")) {
@@ -90,7 +79,7 @@ public final class TeiServer {
         }
 
         if (publicAccess.allowed(path) || Credentials.fromSession(session, credentialsStore).valid()) {
-            final boolean asTei = Boolean.valueOf(session.getParameters().getOrDefault("tei", List.of(Boolean.FALSE.toString())).get(0));
+            final boolean asTei = Boolean.parseBoolean(session.getParameters().getOrDefault("tei", LIST_OF_FALSE).get(0));
             final Document document = Files.isDirectory(path) ? buildDirectoryPage(path) : buildPage(path, asTei);
             return newFixedLengthResponse(Status.OK, document.mime(), document.document());
         }
@@ -105,8 +94,7 @@ public final class TeiServer {
         return newChunkedResponse(Status.OK, mimeTypes().get(mimekey), inRes);
     }
 
-    private static Document buildPage(final Path pathTei, final boolean asTei)
-        throws IOException, SAXException, TransformerException, ParserConfigurationException, XMLStreamException {
+    private static Document buildPage(final Path pathTei, final boolean asTei) throws IOException, SAXException, TransformerException {
         final Document doc;
         if (asTei) {
             doc = new Document(FileUtil.readFrom(pathTei), "application/xml; charset=utf-8");
@@ -116,15 +104,12 @@ public final class TeiServer {
         return doc;
     }
 
-    private static String convertTeiToHtml(final String tei)
-        throws SAXException, IOException, TransformerException, ParserConfigurationException, XMLStreamException {
-        return "<article><section>"+new SimpleXml(XmlUnMilestone.unMilestone(tei,PB)).transform(teishXslt())+"</section></article>";
+    private static String convertTeiToHtml(final String tei) throws SAXException, IOException, TransformerException {
+        return "<article><section>"+new SimpleXml(tei).transform(teishXslt())+"</section></article>";
     }
 
     private static String teishXslt() throws IOException {
-        try (final InputStream in = new URL(URL_TEISH_XSLT).openStream()) {
-            return new String(in.readAllBytes(), StandardCharsets.UTF_8);
-        }
+        return FileUtil.readFrom(Paths.get(URI_TEISH_XSLT));
     }
 
     private static Document buildDirectoryPage(final Path path) throws IOException {
