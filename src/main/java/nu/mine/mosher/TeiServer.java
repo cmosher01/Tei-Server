@@ -30,7 +30,7 @@ public final class TeiServer {
     private static final URL URL_TEISH_XSLT;
     static {
         try {
-            URL_TEISH_XSLT = URI.create("https://raw.githack.com/cmosher01/teish/master/src/main/resources/teish.xslt").toURL();
+            URL_TEISH_XSLT = URI.create("https://raw.githack.com/cmosher01/Tei-Server/master/src/main/resources/teish.xslt").toURL();
         } catch (final Throwable e) {
             throw new IllegalStateException(e);
         }
