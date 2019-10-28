@@ -11,7 +11,15 @@ Digital Archives (TEI format) server. Small and simple for now.
 
 HTTP server accepts requests for TEI files (from the tree rooted at
 the current default directory), and converts them to HTML web pages,
-using [TEISH XSLT and CSS](https://github.com/cmosher01/teish).
+using XSLT and CSS.
+
+The XSLT/CSS component could also be used standalone. To do this,
+use `teish.xslt` to transform your TEI XML file into HTML.
+Use that resulting HTML somewhere in the body of a web page
+that uses `teish.css`, to style it correctly:
+
+ * https://raw.githack.com/cmosher01/Tei-Server/master/src/main/resources/teish.xslt
+ * https://raw.githack.com/cmosher01/Tei-Server/master/src/main/resources/teish.css
 
 # Security
 
