@@ -42,7 +42,7 @@ Other files will be served to an authenticated `guest` user. Specify the
 guest password as an environment variable:
 
 ```sh
-export GUEST_PASSWORD=secr3t@ccess4U
+export GUEST_PASSWORD=ExplodeDupeUnmatchedDarkenedPreviousProblem
 ```
 
 # Run with Docker
