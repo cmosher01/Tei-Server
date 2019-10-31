@@ -46,6 +46,11 @@ dependencies {
 
 
 
+    // guava
+    implementation group: 'com.google.guava', name: 'guava', version: 'latest.release'
+
+
+
     // logging
     implementation group: 'org.slf4j', name: 'jul-to-slf4j', version: 'latest.integration'
     runtimeOnly group: 'org.slf4j', name: 'log4j-over-slf4j', version: 'latest.release'

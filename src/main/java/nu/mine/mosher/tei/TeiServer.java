@@ -1,5 +1,6 @@
 package nu.mine.mosher.tei;
 
+import com.google.common.io.ByteStreams;
 import com.xmlcalabash.drivers.CalabashApi;
 import com.xmlcalabash.util.UserArgs;
 import fi.iki.elonen.NanoHTTPD;
@@ -179,7 +180,8 @@ public final class TeiServer {
     private static Response getResource(final String sUri, final String mimekey) throws URISyntaxException, IOException {
         String res = "/" + sUri;
         res = res.substring(res.lastIndexOf('/') + 1);
-        final byte[] bytes = Files.readAllBytes(Paths.get(TeiServer.class.getClassLoader().getResource(res).toURI()));
+        final InputStream stream = TeiServer.class.getClassLoader().getResourceAsStream(res);
+        final byte[] bytes = ByteStreams.toByteArray(stream);
         final ByteArrayInputStream inRes = new ByteArrayInputStream(bytes);
         return newFixedLengthResponse(Status.OK, mimeTypes().get(mimekey), inRes, bytes.length);
     }
