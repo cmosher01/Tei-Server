@@ -1,4 +1,4 @@
-package nu.mine.mosher;
+package nu.mine.mosher.security;
 
 import nu.mine.mosher.security.password.StrongHash;
 
@@ -6,7 +6,7 @@ import nu.mine.mosher.security.password.StrongHash;
  * Example Credentials.Store that has only only user, "guest",
  * with a strong password (that we only store the uncrackable hash of).
  */
-final class GuestStoreImpl implements Credentials.Store {
+public final class GuestStoreImpl implements Credentials.Store {
     private static final String GUEST_USERNAME = "guest";
     private static final String GUEST_PASSWORD_HASH;
     static {

@@ -1,0 +1,55 @@
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    // web server
+    implementation group: 'org.nanohttpd', name: 'nanohttpd', version: 'latest.integration'
+
+    // password hash
+    implementation group: 'nu.mine.mosher.security.password', name: 'strong-password-hash', version: 'latest.integration'
+
+
+
+
+    // XML
+    implementation group: 'nu.mine.mosher.xml', name: 'SimpleXml', version: 'latest.integration'
+    implementation group: 'com.xmlcalabash', name: 'xmlcalabash', version: 'latest.release', {
+        exclude group: 'relaxngDatatype'
+        exclude group: 'xml-apis'
+        exclude group: 'com.sun.xml.bind.jaxb'
+        exclude group: 'javax.servlet'
+        exclude group: 'org.restlet.jee'
+        exclude group: 'org.apache.ant'
+        exclude group: 'org.apache.logging.log4j'
+        exclude group: 'commons-logging'
+        exclude group: 'commons-fileupload'
+        exclude group: 'junit'
+    }
+    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: 'latest.release', {
+        force = true
+        transitive = false
+    }
+    implementation group: 'org.apache.httpcomponents', name: 'httpmime', version: 'latest.release', {
+        force = true
+        transitive = false
+    }
+    implementation group: 'org.apache.httpcomponents', name: 'httpcore', version: 'latest.release', {
+        force = true
+        transitive = false
+    }
+    implementation group: 'commons-codec', name: 'commons-codec', version: 'latest.release', {
+        force = true
+        transitive = false
+    }
+
+
+
+    // logging
+    implementation group: 'org.slf4j', name: 'jul-to-slf4j', version: 'latest.integration'
+    runtimeOnly group: 'org.slf4j', name: 'log4j-over-slf4j', version: 'latest.release'
+    runtimeOnly group: 'org.slf4j', name: 'jcl-over-slf4j', version: 'latest.release'
+
+    runtimeOnly group: 'org.slf4j', name: 'slf4j-simple', version: 'latest.release'
+}

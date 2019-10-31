@@ -1,21 +1,7 @@
-repositories {
-    mavenCentral()
-    jcenter()
+def inc(module) {
+    apply from: "${rootProject.projectDir}/gradle/${module}.gradle"
 }
 
-apply plugin: 'java'
-apply plugin: 'application'
-
-dependencies {
-    implementation group: 'org.nanohttpd', name: 'nanohttpd', version: 'latest.integration'
-    implementation group: 'nu.mine.mosher.security.password', name: 'strong-password-hash', version: 'latest.integration'
-    implementation group: 'nu.mine.mosher.xml', name: 'SimpleXml', version: 'latest.integration'
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: 'latest.release'
-
-    runtimeOnly group: 'org.slf4j', name: 'slf4j-simple', version: 'latest.release'
-}
-
-group = 'nu.mine.mosher'
-version = '1.0.0-SNAPSHOT'
-mainClassName = 'nu.mine.mosher.TeiServer'
-java.sourceCompatibility = JavaVersion.VERSION_1_8
+inc('version')
+inc('project')
+inc('dependencies')

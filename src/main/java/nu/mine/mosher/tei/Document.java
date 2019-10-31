@@ -1,6 +1,6 @@
-package nu.mine.mosher;
+package nu.mine.mosher.tei;
 
-public class Document {
+class Document {
     private final String document;
     private final String mime;
 

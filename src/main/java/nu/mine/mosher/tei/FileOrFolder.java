@@ -1,4 +1,4 @@
-package nu.mine.mosher;
+package nu.mine.mosher.tei;
 
 import java.io.IOException;
 import java.nio.file.Files;

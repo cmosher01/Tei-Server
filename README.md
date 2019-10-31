@@ -1,4 +1,4 @@
-# Tei-Server
+# TEI Server
 
 Copyright © 2018–2019, Christopher Alan Mosher, Shelton, Connecticut, USA, <cmosher01@gmail.com>.
 
@@ -7,23 +7,17 @@ Copyright © 2018–2019, Christopher Alan Mosher, Shelton, Connecticut, USA, <c
 
 TEI database web server.
 
-Digital Archives (TEI format) server. Small and simple for now.
+Digital Archives ([TEI format](https://tei-c.org/)) server. Small and simple.
 
-HTTP server accepts requests for TEI files (from the tree rooted at
-the current default directory), and converts them to HTML web pages,
-using XSLT and CSS.
+The HTTP server accepts requests for TEI files (from the tree rooted at
+the current default directory), and converts them to XHTML5 web pages,
+using XProc, XSLT, and CSS.
 
-The XSLT/CSS component could also be used standalone. To do this,
-use `teish.xslt` to transform your TEI XML file into HTML.
-Use that resulting HTML somewhere in the body of a web page
-that uses `teish.css`, to style it correctly:
-
- * https://raw.githack.com/cmosher01/Tei-Server/master/src/main/resources/teish.xslt
- * https://raw.githack.com/cmosher01/Tei-Server/master/src/main/resources/teish.css
+Only files of type `.xml` or `.tei` will be recognized.
 
 # Security
 
-By default, this server will not serve any files. Any files that
+By default, this server will not serve any files publicly. Any files that
 are to be served publicly must be indicated in a file named
 
 ```
@@ -31,17 +25,32 @@ are to be served publicly must be indicated in a file named
 ```
 
 located in the current default directory (the root of tree to be served).
-Each line of the file contains a file-glob of the path to serve.
-For example, to serve every file in the tree rooted at that directory:
-
-```
-**
-```
-
-Other examples:
-
+Each line of the file contains a file-glob of the path to serve publicly.
+For example:
 ```
 foobar.tei
 path/to/files/*
 path/to/tree/**
 ```
+
+To serve every file in the tree rooted at the current default directory:
+```
+**
+```
+
+Other files will be served to an authenticated `guest` user. Specify the
+guest password as an environment variable:
+
+```sh
+export GUEST_PASSWORD=secr3t@ccess4U
+```
+
+# Run with Docker
+
+The easiest way to run TEI Server is with Docker. For example:
+
+```sh
+docker run -d -v "/srv/tei:/home/user:ro" -p "8080:8080" cmosher01/tei-server
+```
+
+The browse to `http://localhost:8080/`.

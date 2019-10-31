@@ -1,4 +1,4 @@
-package nu.mine.mosher;
+package nu.mine.mosher.security;
 
 import fi.iki.elonen.NanoHTTPD;
 import nu.mine.mosher.security.password.HashedString;

@@ -1,4 +1,4 @@
-package nu.mine.mosher;
+package nu.mine.mosher.security;
 
 public final class LogUtil {
     private static final String PLACEHOLDER = "_";

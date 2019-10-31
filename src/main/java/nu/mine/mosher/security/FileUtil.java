@@ -1,4 +1,4 @@
-package nu.mine.mosher;
+package nu.mine.mosher.security;
 
 import org.slf4j.*;
 
@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.stream.Collectors;
 
-import static nu.mine.mosher.LogUtil.cleanse;
+import static nu.mine.mosher.security.LogUtil.cleanse;
 
 public final class FileUtil {
     public static final Path CWD = getCwd();
