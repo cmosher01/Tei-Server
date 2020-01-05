@@ -177,7 +177,7 @@ public final class TeiServer {
                 "</html>\n";
     }
 
-    private static Response getResource(final String sUri, final String mimekey) throws URISyntaxException, IOException {
+    private static Response getResource(final String sUri, final String mimekey) throws IOException {
         String res = "/" + sUri;
         res = res.substring(res.lastIndexOf('/') + 1);
         final InputStream stream = TeiServer.class.getClassLoader().getResourceAsStream(res);

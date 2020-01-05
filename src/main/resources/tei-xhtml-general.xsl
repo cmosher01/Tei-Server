@@ -10,7 +10,7 @@
 
     <!-- DEFAULT (block) TEI elem ==> HTML div class=tei-elem -->
     <!-- TODO: add more block elements -->
-    <xsl:template match="tei:teiHeader|tei:fileDesc|tei:titleStmt|tei:publicationStmt|tei:sourceDesc|tei:profileDesc|tei:particDesc|tei:person|tei:text|tei:body|tei:p|tei:facsimile">
+    <xsl:template match="tei:TEI|tei:teiHeader|tei:fileDesc|tei:titleStmt|tei:publicationStmt|tei:sourceDesc|tei:profileDesc|tei:particDesc|tei:person|tei:text|tei:body|tei:p|tei:facsimile">
         <xsl:element name="div" namespace="http://www.w3.org/1999/xhtml">
             <xsl:attribute name="class">
                 <xsl:value-of select="fn:concat('tei-', fn:local-name())"/>

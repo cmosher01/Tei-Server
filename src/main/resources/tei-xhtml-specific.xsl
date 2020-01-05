@@ -11,16 +11,6 @@
     <!-- remove xml-model processing instructions, because this will no longer be TEI -->
     <xsl:template match="processing-instruction('xml-model')"/>
 
-    <!-- TEI document ==> HTML web page -->
-    <xsl:template match="tei:TEI">
-        <xsl:element name="div" namespace="http://www.w3.org/1999/xhtml">
-            <xsl:attribute name="class">
-                <xsl:value-of select="fn:concat('tei-', fn:local-name())"/>
-            </xsl:attribute>
-            <xsl:apply-templates select="@* | node()"/>
-        </xsl:element>
-    </xsl:template>
-
     <!-- TEI head ==> HTML header -->
     <xsl:template match="tei:head">
         <xsl:element name="header" namespace="http://www.w3.org/1999/xhtml">
