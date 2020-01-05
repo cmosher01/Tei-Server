@@ -21,13 +21,6 @@
     font-size: 80%;
 }
 
-[rend~="grid2"] {
-    display: grid;
-    grid-gap: 3em;
-    grid-template-columns: minmax(240px, 90vw) minmax(max-content, 1fr);
-    grid-auto-rows: minmax(50vh, auto);
-}
-
 hr {
     border-top: thin solid var(--sol-base1);
 }
