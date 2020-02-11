@@ -7,10 +7,6 @@
     display: none;
 }
 
-.tei-TEI {
-    margin: 2ex 2rem 2ex 2rem;
-}
-
 .tei-fileDesc>.tei-titleStmt {
     margin-bottom: 2ex;
     font-size: 110%;
