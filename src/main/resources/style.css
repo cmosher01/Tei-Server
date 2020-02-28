@@ -3,8 +3,8 @@
 @import url("https://mosher.mine.nu/uniwebfonts/css/fonts.css");
 @import url("teish.css");
 
-section {
-    margin: 2ex 2rem 2ex 2rem;
+body {
+    margin: 6ex 4em 12ex 4em;
 }
 
 a:hover {
