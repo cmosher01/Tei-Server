@@ -5,7 +5,6 @@ import com.xmlcalabash.drivers.CalabashApi;
 import com.xmlcalabash.util.UserArgs;
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.Response.Status;
-import net.sf.saxon.s9api.SaxonApiException;
 import nu.mine.mosher.security.*;
 import org.slf4j.*;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -62,7 +61,7 @@ public final class TeiServer {
         throw new UnsupportedOperationException();
     }
 
-    private static Response getDocument(final IHTTPSession session, final FileAccess publicAccess) throws IOException, URISyntaxException, SaxonApiException {
+    private static Response getDocument(final IHTTPSession session, final FileAccess publicAccess) throws IOException, CalabashApi.CalabashException {
         final String sUri = session.getUri();
         LOG.trace("Will process request for: {}", sUri);
 
@@ -97,7 +96,7 @@ public final class TeiServer {
         return unauthorized();
     }
 
-    private static Document buildPage(final Path pathTei, final boolean asTei) throws IOException, URISyntaxException, SaxonApiException {
+    private static Document buildPage(final Path pathTei, final boolean asTei) throws IOException, CalabashApi.CalabashException {
         final Document doc;
         if (asTei) {
             doc = new Document(FileUtil.readFrom(pathTei), "application/xml; charset=utf-8");
@@ -107,7 +106,7 @@ public final class TeiServer {
         return doc;
     }
 
-    private static Document putTeiThroughPipeline(final URL urlXmlInput, final URL urlPipeline) throws IOException, URISyntaxException, SaxonApiException {
+    private static Document putTeiThroughPipeline(final URL urlXmlInput, final URL urlPipeline) throws IOException, CalabashApi.CalabashException {
         final ByteArrayOutputStream result = new ByteArrayOutputStream(2048);
 
         final UserArgs userArgs = new UserArgs();
