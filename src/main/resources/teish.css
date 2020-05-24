@@ -101,14 +101,6 @@ hr {
     display: none;
 }
 
-.tei-title[level=a]::before, .tei-title[level=u]::before {
-    content: '\00201c';
-}
-
-.tei-title[level=a]::after, .tei-title[level=u]::after {
-    content: '\00201d';
-}
-
 .tei-title[level=m], .tei-title[level=j], .tei-title[level=s] {
     font-style: italic;
 }
