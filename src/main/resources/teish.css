@@ -18,7 +18,10 @@
 }
 
 hr {
-    border-top: thin solid var(--sol-base1);
+    border-style: solid;
+    border-width: 1px 0 0 0;
+    border-color: var(--sol-base1);
+    margin: 2em 0;
 }
 
 .tei-pb::before {
