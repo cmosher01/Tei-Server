@@ -11,3 +11,8 @@ a:hover {
     background-color: var(--sol-base2);
     color: var(--sol-orange);
 }
+
+nav {
+    float: right;
+    font-size: 80%;
+}

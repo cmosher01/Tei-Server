@@ -33,6 +33,16 @@
                 </xsl:element>
             </xsl:element>
             <xsl:element name="body" namespace="http://www.w3.org/1999/xhtml">
+                <xsl:element name="nav" namespace="http://www.w3.org/1999/xhtml">
+                    (
+                    <xsl:element name="a" namespace="http://www.w3.org/1999/xhtml">
+                        <xsl:attribute name="href">
+                            <xsl:value-of select="'?tei=TRUE'"/>
+                        </xsl:attribute>
+                        view source
+                    </xsl:element>
+                    )
+                </xsl:element>
                 <xsl:element name="div" namespace="http://www.w3.org/1999/xhtml">
                     <xsl:apply-templates select="@* | node()"/>
                 </xsl:element>
