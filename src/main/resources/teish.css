@@ -76,6 +76,10 @@ hr {
     font-variant: small-caps;
 }
 
+[rend~=large] {
+    font-size: 150%;
+}
+
 [type=turnover]>.tei-lb, [type=turnunder]>.tei-lb {
     display: none;
 }
