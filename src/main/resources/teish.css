@@ -115,6 +115,8 @@ hr {
 img.tei-graphic {
     width: 100%;
     object-fit: scale-down;
+    object-position: left top;
+    max-height: 1500px;
 }
 
 .tei-bibl>.tei-ref {
