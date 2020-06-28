@@ -33,18 +33,29 @@
                 </xsl:element>
             </xsl:element>
             <xsl:element name="body" namespace="http://www.w3.org/1999/xhtml">
-                <xsl:element name="nav" namespace="http://www.w3.org/1999/xhtml">
-                    (
-                    <xsl:element name="a" namespace="http://www.w3.org/1999/xhtml">
-                        <xsl:attribute name="href">
-                            <xsl:value-of select="'?tei=TRUE'"/>
-                        </xsl:attribute>
-                        view source
+                <xsl:element name="header" namespace="http://www.w3.org/1999/xhtml">
+                    <xsl:element name="nav" namespace="http://www.w3.org/1999/xhtml">
+                        (
+                        <xsl:element name="a" namespace="http://www.w3.org/1999/xhtml">
+                            <xsl:attribute name="href">
+                                <xsl:value-of select="'?tei=TRUE'"/>
+                            </xsl:attribute>
+                            view source
+                        </xsl:element>
+                        )
                     </xsl:element>
-                    )
                 </xsl:element>
                 <xsl:element name="div" namespace="http://www.w3.org/1999/xhtml">
                     <xsl:apply-templates select="@* | node()"/>
+                </xsl:element>
+                <xsl:element name="footer" namespace="http://www.w3.org/1999/xhtml">
+                    <xsl:element name="hr" namespace="http://www.w3.org/1999/xhtml"/>
+                    <xsl:element name="div" namespace="http://www.w3.org/1999/xhtml">
+                        <xsl:attribute name="class">
+                            <xsl:value-of select="'copyright'"/>
+                        </xsl:attribute>
+                        <xsl:apply-templates select="node()[@class='tei-teiHeader']/node()[@class='tei-fileDesc']/node()[@class='tei-publicationStmt']/node()[@class='tei-availability']"/>
+                    </xsl:element>
                 </xsl:element>
             </xsl:element>
         </xsl:element>
