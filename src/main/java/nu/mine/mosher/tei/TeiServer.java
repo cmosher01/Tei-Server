@@ -1,24 +1,26 @@
 package nu.mine.mosher.tei;
 
-import com.google.common.io.ByteStreams;
-import com.xmlcalabash.drivers.CalabashApi;
-import com.xmlcalabash.util.UserArgs;
-import fi.iki.elonen.NanoHTTPD;
-import fi.iki.elonen.NanoHTTPD.Response.Status;
 import nu.mine.mosher.security.*;
+import nu.mine.mosher.xml.TeiToXhtml5;
+import org.nanohttpd.protocols.http.*;
+import org.nanohttpd.protocols.http.response.*;
+import org.nanohttpd.util.IHandler;
 import org.slf4j.*;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 
-import static com.xmlcalabash.util.Input.Type.XML;
-import static fi.iki.elonen.NanoHTTPD.*;
-import static fi.iki.elonen.NanoHTTPD.Response.Status.*;
 import static java.lang.Runtime.getRuntime;
+import static org.nanohttpd.protocols.http.NanoHTTPD.*;
+import static org.nanohttpd.protocols.http.response.Response.*;
+import static org.nanohttpd.protocols.http.response.Status.*;
 
 public final class TeiServer {
     static {
@@ -33,19 +35,18 @@ public final class TeiServer {
 
         final FileAccess publicAccess = new FileAccess(FileAccess.readPatternsFrom(Paths.get(".SERVE_PUBLIC.globs")));
 
-        final NanoHTTPD server = new NanoHTTPD(PORT) {
-            @Override
-            public Response serve(final IHTTPSession session) {
-                LOG.trace("--------------------------------------------------");
-                try {
-                    return getDocument(session, publicAccess);
-                } catch (final Throwable e) {
-                    LOG.error("Exception while processing request:", e);
-                    return super.serve(session);
-                }
+        final IHandler<IHTTPSession, Response> handlerRequests = session -> {
+            LOG.trace("--------------------------------------------------");
+            try {
+                return getDocument(session, publicAccess);
+            } catch (final Throwable e) {
+                LOG.error("Exception while processing request:", e);
+                return newFixedLengthResponse(NOT_FOUND, MIME_PLAINTEXT, NOT_FOUND.getDescription());
             }
         };
 
+        final NanoHTTPD server = new NanoHTTPD(PORT) { };
+        server.setHTTPHandler(handlerRequests);
         getRuntime().addShutdownHook(new Thread(server::stop));
         server.start(SOCKET_READ_TIMEOUT, false);
     }
@@ -61,11 +62,14 @@ public final class TeiServer {
         throw new UnsupportedOperationException();
     }
 
-    private static Response getDocument(final IHTTPSession session, final FileAccess publicAccess) throws IOException, CalabashApi.CalabashException {
+    private static Response getDocument(final IHTTPSession session, final FileAccess publicAccess) throws IOException, TransformerException, ParserConfigurationException, SAXException {
         final String sUri = session.getUri();
         LOG.trace("Will process request for: {}", sUri);
 
         if (sUri.endsWith(".css")) {
+            if (sUri.endsWith("/teish.css") || sUri.endsWith("/tei.css")) {
+                return getTeiCss();
+            }
             return getResource(sUri, "css");
         }
         if (sUri.endsWith(".ico")) {
@@ -96,27 +100,24 @@ public final class TeiServer {
         return unauthorized();
     }
 
-    private static Document buildPage(final Path pathTei, final boolean asTei) throws IOException, CalabashApi.CalabashException {
+    private static Document buildPage(final Path pathTei, final boolean asTei) throws IOException, TransformerException, ParserConfigurationException, SAXException {
         final Document doc;
         if (asTei) {
             doc = new Document(FileUtil.readFrom(pathTei), "application/xml; charset=utf-8");
         } else {
-            doc = putTeiThroughPipeline(pathTei.toUri().toURL(), TeiServer.class.getClassLoader().getResource("tei-to-html.xpl"));
+            doc = putTeiThroughPipeline(pathTei.toUri().toURL());
         }
         return doc;
     }
 
-    private static Document putTeiThroughPipeline(final URL urlXmlInput, final URL urlPipeline) throws IOException, CalabashApi.CalabashException {
+    private static Document putTeiThroughPipeline(final URL urlXmlInput) throws IOException, TransformerException, ParserConfigurationException, SAXException {
         final ByteArrayOutputStream result = new ByteArrayOutputStream(2048);
 
-        final UserArgs userArgs = new UserArgs();
-
-        userArgs.setSafeMode(true);
-        userArgs.addInput(null, urlXmlInput.toExternalForm(), XML);
-        userArgs.setPipeline(urlPipeline.toExternalForm());
-        userArgs.addOutput(null, result);
-
-        new CalabashApi().run(userArgs);
+        final URLConnection conn = urlXmlInput.openConnection();
+        final BufferedInputStream inXml = new BufferedInputStream(conn.getInputStream());
+        final BufferedOutputStream outXhtml5 = new BufferedOutputStream(result);
+        TeiToXhtml5.transform(inXml, outXhtml5, true);
+        outXhtml5.close();
 
         return new Document(result.toString(StandardCharsets.UTF_8.name()), "application/xhtml+xml; charset=utf-8");
     }
@@ -180,8 +181,15 @@ public final class TeiServer {
         String res = "/" + sUri;
         res = res.substring(res.lastIndexOf('/') + 1);
         final InputStream stream = TeiServer.class.getClassLoader().getResourceAsStream(res);
-        final byte[] bytes = ByteStreams.toByteArray(stream);
+        if (Objects.isNull(stream)) {
+            return newFixedLengthResponse(NOT_FOUND, MIME_PLAINTEXT, NOT_FOUND.getDescription());
+        }
+        final byte[] bytes = stream.readAllBytes();
         final ByteArrayInputStream inRes = new ByteArrayInputStream(bytes);
         return newFixedLengthResponse(Status.OK, mimeTypes().get(mimekey), inRes, bytes.length);
+    }
+
+    private static Response getTeiCss() throws IOException {
+        return newFixedLengthResponse(Status.OK, mimeTypes().get("css"), TeiToXhtml5.getCss());
     }
 }

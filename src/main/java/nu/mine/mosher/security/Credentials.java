@@ -1,8 +1,8 @@
 package nu.mine.mosher.security;
 
-import fi.iki.elonen.NanoHTTPD;
 import nu.mine.mosher.security.password.HashedString;
 import nu.mine.mosher.security.password.StrongHash;
+import org.nanohttpd.protocols.http.IHTTPSession;
 
 import java.util.Base64;
 
@@ -21,7 +21,7 @@ public class Credentials {
         String passwordFor(String user);
     }
 
-    public static Credentials fromSession(final NanoHTTPD.IHTTPSession session, final Store store) {
+    public static Credentials fromSession(final IHTTPSession session, final Store store) {
         final String authorization = session.getHeaders().getOrDefault("authorization", "");
         return new Credentials(checkValid(authorization, store));
     }
