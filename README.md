@@ -1,6 +1,6 @@
 # TEI Server
 
-Copyright © 2018–2019, Christopher Alan Mosher, Shelton, Connecticut, USA, <cmosher01@gmail.com>.
+Copyright © 2018–2021, Christopher Alan Mosher, Shelton, Connecticut, USA, <cmosher01@gmail.com>.
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CVSSQ2BWDCKQ2)
 [![License](https://img.shields.io/github/license/cmosher01/Tei-Server.svg)](https://www.gnu.org/licenses/gpl.html)
@@ -11,7 +11,7 @@ Digital Archives ([TEI format](https://tei-c.org/)) server. Small and simple.
 
 The HTTP server accepts requests for TEI files (from the tree rooted at
 the current default directory), and converts them to XHTML5 web pages,
-using XProc, XSLT, and CSS.
+using XSLT, and CSS.
 
 Only files of type `.xml` or `.tei` will be recognized.
 
@@ -36,13 +36,6 @@ path/to/tree/**
 To serve every file in the tree rooted at the current default directory:
 ```
 **
-```
-
-Other files will be served to an authenticated `guest` user. Specify the
-guest password as an environment variable:
-
-```sh
-export GUEST_PASSWORD=ExplodeDupeUnmatchedDarkenedPreviousProblem
 ```
 
 # Run with Docker

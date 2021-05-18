@@ -56,7 +56,6 @@ public final class TeiServer {
     private static final List<String> LIST_OF_FALSE = Collections.singletonList(Boolean.FALSE.toString());
     private static final Logger LOG;
     private static final int PORT = 8080;
-    private static final Credentials.Store credentialsStore = GuestStoreImpl.instance();
 
     private TeiServer() {
         throw new UnsupportedOperationException();
@@ -89,9 +88,8 @@ public final class TeiServer {
         }
 
         final boolean pathAllowed = publicAccess.allowed(path);
-        final boolean credsValid = Credentials.fromSession(session, credentialsStore).valid();
 
-        if (pathAllowed || credsValid) {
+        if (pathAllowed) {
             final boolean asTei = Boolean.parseBoolean(session.getParameters().getOrDefault("tei", LIST_OF_FALSE).get(0));
             final Document document = Files.isDirectory(path) ? buildDirectoryPage(path) : buildPage(path, asTei);
             return newFixedLengthResponse(Status.OK, document.mime(), document.document());

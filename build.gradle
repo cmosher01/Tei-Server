@@ -1,7 +1,48 @@
-def inc(module) {
-    apply from: "${projectDir}/gradle/${module}.gradle"
+plugins {
+    id 'application'
 }
 
-inc('version')
-inc('project')
-inc('dependencies')
+repositories {
+    mavenCentral()
+    maven {
+        // for nanohttpd snapshots:
+        url "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
+}
+
+dependencies {
+    // web server
+    implementation group: 'org.nanohttpd', name: 'nanohttpd', version: 'latest.integration'
+
+    // TEI
+    implementation group: 'nu.mine.mosher.xml', name: 'tei-to-xhtml5', version: 'latest.release'
+
+    // XML
+    runtimeOnly group: 'xerces', name: 'xercesImpl', version: 'latest.release', {
+        exclude group: 'xml-apis'
+    }
+    runtimeOnly group: 'net.sf.saxon', name: 'Saxon-HE', version: 'latest.release'
+
+    // logging
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: 'latest.release', {
+        exclude group: 'com.sun.mail'
+    }
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: 'latest.release'
+    implementation group: 'org.slf4j', name: 'jul-to-slf4j', version: 'latest.integration'
+    runtimeOnly group: 'org.slf4j', name: 'log4j-over-slf4j', version: 'latest.release'
+    runtimeOnly group: 'org.slf4j', name: 'jcl-over-slf4j', version: 'latest.release'
+}
+
+application {
+    mainClassName = 'nu.mine.mosher.tei.TeiServer'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of 11
+    }
+}
+
+group = 'nu.mine.mosher.genealogy'
+
+version = '1.1.1'

@@ -6,6 +6,3 @@ java {
     sourceCompatibility = JavaVersion.VERSION_11
 }
 
-application {
-    mainClassName = 'nu.mine.mosher.tei.TeiServer'
-}

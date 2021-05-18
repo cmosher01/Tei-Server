@@ -16,3 +16,8 @@ nav {
     float: right;
     font-size: 80%;
 }
+
+:target {
+    color: var(--sol-base03);
+    background-color: var(--sol-base2);
+}
