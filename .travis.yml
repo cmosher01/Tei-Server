@@ -1,0 +1,10 @@
+---
+sudo: required
+services:
+  - docker
+script:
+  - 'docker build -t tei-server .'
+after_success:
+  - 'docker login -u $DOCKER_USERNAME -p $DOCKER_TOKEN'
+  - 'docker tag tei-server $DOCKER_USERNAME/tei-server:latest'
+  - 'docker push $DOCKER_USERNAME/tei-server:latest'
