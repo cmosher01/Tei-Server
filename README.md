@@ -5,6 +5,16 @@ Copyright © 2018–2021, Christopher Alan Mosher, Shelton, Connecticut, USA, <c
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CVSSQ2BWDCKQ2)
 [![License](https://img.shields.io/github/license/cmosher01/Tei-Server.svg)](https://www.gnu.org/licenses/gpl.html)
 
+# Archived
+
+This project is now archived. The TEI server functionality has been
+folded into the generic [xml-servlet](https://github.com/cmosher01/xml-servlet)
+project.
+
+---
+
+# Introduction
+
 TEI database web server.
 
 Digital Archives ([TEI format](https://tei-c.org/)) server. Small and simple.
